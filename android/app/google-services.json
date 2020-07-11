@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1002912855274",
+    "firebase_url": "https://unirais-bb94a.firebaseio.com",
+    "project_id": "unirais-bb94a",
+    "storage_bucket": "unirais-bb94a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002912855274:android:8af77fa9f7a44276e41393",
+        "android_client_info": {
+          "package_name": "za.co.unirais"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1002912855274-k3an5l5m746e3nr9f4d4ftstqain6lfg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "za.co.unirais",
+            "certificate_hash": "274b495653ce95af54053bd8125b5f752157c427"
+          }
+        },
+        {
+          "client_id": "1002912855274-u3q2dgcim702a7msvugshvpb5q0tmk1d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1zP2jtlcz9ZVjMgzxVcu9u3nnMCX192s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1002912855274-u3q2dgcim702a7msvugshvpb5q0tmk1d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

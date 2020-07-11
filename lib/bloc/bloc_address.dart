@@ -1,0 +1,47 @@
+import 'package:bloc/bloc.dart';
+
+import './../const/timers.dart';
+import './../model/_model.dart';
+import './../repository/address_repository.dart';
+import './events/_events.dart';
+import './states/_states.dart';
+
+class BlocAddress extends Bloc<BlocEventAddress, BlocStateAddress> {
+  final AddressRepository _addressRepository = AddressRepository();
+
+  @override
+  BlocStateAddress get initialState => BlocStateAddressInitial();
+
+  @override
+  Stream<BlocStateAddress> mapEventToState(BlocEventAddress event) async* {
+    if (event is BlocEventAddressCUD) {
+      yield BlocStateAddressCUDProcessing();
+      try {
+        if (event is BlocEventAddressCUDCreate) {
+          await _addressRepository.addNewAddress(event.address);
+        } else if (event is BlocEventAddressCUDUpdate)
+          await _addressRepository.updateAddress(event.address);
+        else if (event is BlocEventAddressCUDDelete)
+          await _addressRepository.deleteAddress(event.address);
+        else if (event is BlocEventAddressCUDDeleteAll)
+          await _addressRepository.deleteAllAddresses();
+        yield BlocStateAddressCUDSuccess();
+      } catch (e) {
+        print(e);
+        yield BlocStateAddressCUDFailure();
+      }
+      await Future.delayed(Duration(
+        milliseconds: LOADING_DELAY_TIME,
+      ));
+    }
+    yield BlocStateAddressFetching();
+    try {
+      final List<Address> addresses =
+          await _addressRepository.getAllAddresses();
+      yield BlocStateAddressFetchingSuccess(addresses);
+    } catch (e) {
+      print(e);
+      BlocStateAddressFetchingFailure();
+    }
+  }
+}
