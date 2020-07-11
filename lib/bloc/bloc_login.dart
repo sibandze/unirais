@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
 import './../repository/_repository.dart';
-import './authentication_bloc.dart';
+import './bloc_authentication.dart';
 import './events/_events.dart';
 import './states/_states.dart';
 
@@ -27,11 +27,10 @@ class BlocLogin extends Bloc<BlocEventLogin, LoginState> {
           password: event.password,
         );
 
-        authenticationBloc.add(BlocEventAuthenticationLoggedIn(token: token));
         /*await Future.delayed(Duration(
           milliseconds: PRODUCT_LOADING_TIME,
         ));*/
-        yield LoginSuccess();
+        yield LoginSuccess(token: token);
       } catch (error) {
         yield LoginFailure(error: error.toString());
       }

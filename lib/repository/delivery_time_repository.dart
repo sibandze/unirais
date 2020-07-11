@@ -7,59 +7,59 @@ import './../const/_const.dart' as CONSTANTS;
 import './../model/_model.dart';
 import './../services/web_service/webservice.dart';
 
-class UniversityRepository {
-  static final UniversityRepository universityRepository =
-      UniversityRepository();
+class DeliveryTimeRepository {
+  static final DeliveryTimeRepository deliveryTimeRepository =
+      DeliveryTimeRepository();
 
-  Future<List<University>> getUniversities() async {
-    List<University> _uniList = await WebService().get(
+  Future<List<DeliveryTime>> getDeliveryTimes() async {
+    List<DeliveryTime> result = await WebService().get(
       Resource(
         parse: (http.Response response) {
           var _result = jsonDecode(response.body);
-          return (_result['universities'] as List)
-              .map((e) => University.fromMap(e))
+          return (_result['residencies'] as List)
+              .map((e) => DeliveryTime.fromMap(e))
               .toList();
         },
-        url: CONSTANTS.API_URL + '/app/universities',
+        url: CONSTANTS.API_URL + '/app/residencies',
       ),
     );
-    return _uniList;
+    return result;
   }
 
-  Future<bool> addUniversity({@required University university}) async {
+  Future<bool> addDeliveryTime({@required DeliveryTime deliveryTime}) async {
     Map<String, dynamic> result = await WebService().post(
       Resource(
         parse: (http.Response response) {
           return jsonDecode(response.body);
         },
-        params: university.toMap(),
-        url: CONSTANTS.API_URL + '/app/universities/index.php',
+        params: deliveryTime.toMap(),
+        url: CONSTANTS.API_URL + '/app/residencies/index.php',
       ),
     );
     return result['success'];
   }
 
-  Future<bool> updateUniversity({@required University university}) async {
+  Future<bool> updateDeliveryTime({@required DeliveryTime deliveryTime}) async {
     Map<String, dynamic> result = await WebService().patch(
       Resource(
         parse: (http.Response response) {
           return jsonDecode(response.body);
         },
-        params: university.toMap(),
-        url: CONSTANTS.API_URL + '/app/universities/index.php',
+        params: deliveryTime.toMap(),
+        url: CONSTANTS.API_URL + '/app/residencies/index.php',
       ),
     );
     return result['success'];
   }
 
-  Future<bool> deleteUniversity({@required University university}) async {
+  Future<bool> deleteDeliveryTime({@required DeliveryTime deliveryTime}) async {
     Map<String, dynamic> result = await WebService().delete(
       Resource(
         parse: (http.Response response) {
           return jsonDecode(response.body);
         },
         url: CONSTANTS.API_URL +
-            '/app/universities/index.php/?id=${university.id}',
+            '/app/residencies/index.php/?id=${deliveryTime.id}',
       ),
     );
     return result['success'];

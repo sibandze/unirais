@@ -33,7 +33,7 @@ class _AddressExposedPageState extends State<AddressExposedPage> {
   void initState() {
     _addressBloc = BlocProvider.of<BlocAddress>(context);
     _universityBloc = BlocProvider.of<BlocUniversity>(context);
-    _universityBloc.add(FetchUniversities());
+    _universityBloc.add(BlocUniversityEventFetch());
     //_scrollController = ScrollController();
     _roomNumberController = (_address != null)
         ? TextEditingController(text: _address.roomNumber)
@@ -187,13 +187,15 @@ class _AddressExposedPageState extends State<AddressExposedPage> {
                                     }
                                   },
                                 ),
-                                BlocListener<BlocUniversity, UniversityState>(
+                                BlocListener<BlocUniversity,
+                                    BlocUniversityState>(
                                   bloc: _universityBloc,
                                   listener: (BuildContext context,
-                                      UniversityState state) async {
+                                      BlocUniversityState state) async {
                                     if (_address != null &&
                                         firstLoad &&
-                                        state is FetchingUniversitiesSuccess) {
+                                        state
+                                            is BlocUniversityStateFetchingSuccess) {
                                       List<University> _uniList =
                                           state.universities;
                                       for (University uni in _uniList) {
@@ -228,16 +230,16 @@ class _AddressExposedPageState extends State<AddressExposedPage> {
                                         width: 16,
                                       ),
                                       BlocBuilder<BlocUniversity,
-                                          UniversityState>(
+                                          BlocUniversityState>(
                                         bloc: _universityBloc,
                                         builder: (BuildContext context,
-                                            UniversityState state) {
-                                          if (state is InitialUniversityState ||
-                                              state is FetchUniversities) {
+                                            BlocUniversityState state) {
+                                          if (state is BlocUniversityStateInitial ||
+                                              state is BlocUniversityStateFetching) {
                                           } else if (state
-                                              is FetchingUniversitiesFailure) {
+                                          is BlocUniversityStateFetchingFailure) {
                                           } else if (state
-                                              is FetchingUniversitiesSuccess) {
+                                          is BlocUniversityStateFetchingSuccess) {
                                             List<University> _uniList =
                                                 state.universities;
                                             if (_uniList.isNotEmpty) {

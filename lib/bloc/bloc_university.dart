@@ -35,11 +35,11 @@ class BlocUniversity extends Bloc<BlocUniversityEvent, BlocUniversityState> {
         print(e);
         yield BlocUniversityStateCUDFailure();
       }
-
+    } else if (state is BlocUniversityEventFetch) {
       yield BlocUniversityStateFetching();
       await Future.delayed(Duration(
-          //milliseconds: LOADING_DELAY_TIME,
-          ));
+        //milliseconds: LOADING_DELAY_TIME,
+      ));
       try {
         final universities = await _universityRepository.getUniversities();
         yield BlocUniversityStateFetchingSuccess(universities: universities);

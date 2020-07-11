@@ -190,18 +190,19 @@ class __InstitutionDropdownButtonState
   @override
   void initState() {
     _universityBloc = BlocProvider.of<BlocUniversity>(context);
-    _universityBloc.add(FetchUniversities());
+    _universityBloc.add(BlocUniversityEventFetch());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BlocUniversity, UniversityState>(
+    return BlocBuilder<BlocUniversity, BlocUniversityState>(
       bloc: _universityBloc,
-      builder: (BuildContext context, UniversityState state) {
-        if (state is InitialUniversityState || state is FetchUniversities) {
-        } else if (state is FetchingUniversitiesFailure) {
-        } else if (state is FetchingUniversitiesSuccess) {
+      builder: (BuildContext context, BlocUniversityState state) {
+        if (state is BlocUniversityStateInitial ||
+            state is BlocUniversityStateFetching) {
+        } else if (state is BlocUniversityStateFetchingFailure) {
+        } else if (state is BlocUniversityStateFetchingSuccess) {
           List<University> _uniList = state.universities;
           if (_uniList.isNotEmpty) {
             return DropdownButton<University>(

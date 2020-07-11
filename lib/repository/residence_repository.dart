@@ -7,59 +7,58 @@ import './../const/_const.dart' as CONSTANTS;
 import './../model/_model.dart';
 import './../services/web_service/webservice.dart';
 
-class UniversityRepository {
-  static final UniversityRepository universityRepository =
-      UniversityRepository();
+class ResidenceRepository {
+  static final ResidenceRepository residenceRepository = ResidenceRepository();
 
-  Future<List<University>> getUniversities() async {
-    List<University> _uniList = await WebService().get(
+  Future<List<Residence>> getResidencies() async {
+    List<Residence> result = await WebService().get(
       Resource(
         parse: (http.Response response) {
           var _result = jsonDecode(response.body);
-          return (_result['universities'] as List)
-              .map((e) => University.fromMap(e))
+          return (_result['residencies'] as List)
+              .map((e) => Residence.fromMap(e))
               .toList();
         },
-        url: CONSTANTS.API_URL + '/app/universities',
+        url: CONSTANTS.API_URL + '/app/residencies',
       ),
     );
-    return _uniList;
+    return result;
   }
 
-  Future<bool> addUniversity({@required University university}) async {
+  Future<bool> addResidence({@required Residence residence}) async {
     Map<String, dynamic> result = await WebService().post(
       Resource(
         parse: (http.Response response) {
           return jsonDecode(response.body);
         },
-        params: university.toMap(),
-        url: CONSTANTS.API_URL + '/app/universities/index.php',
+        params: residence.toMap(),
+        url: CONSTANTS.API_URL + '/app/residencies/index.php',
       ),
     );
     return result['success'];
   }
 
-  Future<bool> updateUniversity({@required University university}) async {
+  Future<bool> updateResidence({@required Residence residence}) async {
     Map<String, dynamic> result = await WebService().patch(
       Resource(
         parse: (http.Response response) {
           return jsonDecode(response.body);
         },
-        params: university.toMap(),
-        url: CONSTANTS.API_URL + '/app/universities/index.php',
+        params: residence.toMap(),
+        url: CONSTANTS.API_URL + '/app/residencies/index.php',
       ),
     );
     return result['success'];
   }
 
-  Future<bool> deleteUniversity({@required University university}) async {
+  Future<bool> deleteResidence({@required Residence residence}) async {
     Map<String, dynamic> result = await WebService().delete(
       Resource(
         parse: (http.Response response) {
           return jsonDecode(response.body);
         },
         url: CONSTANTS.API_URL +
-            '/app/universities/index.php/?id=${university.id}',
+            '/app/residencies/index.php/?id=${residence.id}',
       ),
     );
     return result['success'];

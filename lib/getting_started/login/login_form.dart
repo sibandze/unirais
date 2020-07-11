@@ -18,6 +18,7 @@ class _LoginFormState extends State<LoginForm> {
   TextEditingController _passwordController = new TextEditingController();
 
   BlocLogin _loginBloc; // TODO
+  BlocAuthentication _authenticationBloc;
   GlobalKey<FormState> _key = new GlobalKey();
   bool _validate = false;
   String email, password;
@@ -94,33 +95,46 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   void initState() {
+    _authenticationBloc = BlocProvider.of<BlocAuthentication>(context);
     _loginBloc = BlocProvider.of<BlocLogin>(context);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<BlocLogin, LoginState>(
-      bloc: _loginBloc,
-      listener: (BuildContext context, LoginState state) {
-        if (state is LoginFailure)
-          _onWidgetDidBuild(
-            () {
-              Scaffold.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${state.error}'),
-                  backgroundColor: Colors.red,
-                ),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<BlocLogin, LoginState>(
+          bloc: _loginBloc,
+          listener: (BuildContext context, LoginState state) {
+            if (state is LoginFailure)
+              _onWidgetDidBuild(
+                () {
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${state.error}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
               );
-            },
-          );
-        else if (state is LoginSuccess)
-          _onWidgetDidBuild(
-            () {
-              pushAndRemoveUntil(context, UniRaisAppHome(), false);
-            },
-          );
-      },
+            else if (state is LoginSuccess)
+              _authenticationBloc
+                  .add(BlocEventAuthenticationLoggedIn(token: state.token));
+          },
+        ),
+        BlocListener<BlocAuthentication, BlocStateAuthentication>(
+          listener: (BuildContext context, BlocStateAuthentication state) {
+            if (state is BlocStateAuthenticationAuthenticated) {
+              _onWidgetDidBuild(
+                () {
+                  pushAndRemoveUntil(context, UniRaisAppHome(), false);
+                },
+              );
+            }
+          },
+        ),
+      ],
       child: BlocBuilder<BlocLogin, LoginState>(
         bloc: _loginBloc,
         builder: (BuildContext context, LoginState state) {

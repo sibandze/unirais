@@ -1,8 +1,8 @@
-export './authentication_bloc.dart';
 export './bloc_address.dart';
+export './bloc_authentication.dart';
 export './bloc_cart.dart';
 export './bloc_categories.dart';
-export './bloc_delivery_times.dart.dart';
+export './bloc_delivery_times.dart';
 export './bloc_login.dart';
 export './bloc_order.dart';
 export './bloc_products.dart';
