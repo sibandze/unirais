@@ -39,6 +39,7 @@ class _PlusMinusInputTextWidgetState extends State<PlusMinusInputTextWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 132,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -57,7 +58,7 @@ class _PlusMinusInputTextWidgetState extends State<PlusMinusInputTextWidget> {
       icon: Icon(
         PRESENTATION.Font_awesome_icons.minus_circled,
         color: PRESENTATION.PRIMARY_COLOR,
-        size: 18,
+        size: 14,
       ),
       onPressed: () async {
         if (_cartItem.quantity > 0) {
@@ -74,7 +75,7 @@ class _PlusMinusInputTextWidgetState extends State<PlusMinusInputTextWidget> {
       icon: Icon(
         PRESENTATION.Font_awesome_icons.plus_circled,
         color: PRESENTATION.PRIMARY_COLOR,
-        size: 18,
+        size: 14,
       ),
       onPressed: () async {
         var val = int.parse(_inputTextBoxController.text) + 1;
@@ -89,7 +90,7 @@ class _PlusMinusInputTextWidgetState extends State<PlusMinusInputTextWidget> {
 
   Widget inputTextBox() {
     return Container(
-      width: 36,
+      width: 24,
       child: BlocListener<BlocCart, Cart>(
         bloc: _cartBloc,
         listener: (BuildContext context, Cart state) async {
@@ -103,7 +104,7 @@ class _PlusMinusInputTextWidgetState extends State<PlusMinusInputTextWidget> {
         child: TextFormField(
           controller: _inputTextBoxController,
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
           textAlignVertical: TextAlignVertical.center,

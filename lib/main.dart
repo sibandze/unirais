@@ -39,6 +39,8 @@ class UniRaisApp extends StatelessWidget {
         ),
         BlocProvider<BlocUniversity>(
           create: (BuildContext context) => BlocUniversity(),
+        ), BlocProvider<BlocDeliveryTime>(
+          create: (BuildContext context) => BlocDeliveryTime(),
         ),
       ],
       child: MaterialApp(

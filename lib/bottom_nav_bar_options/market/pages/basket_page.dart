@@ -89,7 +89,7 @@ class _CartItemListWidget extends StatefulWidget {
 }
 
 class __CartItemListWidgetState extends State<_CartItemListWidget> {
-  BlocCart _cartBloc;
+  //BlocCart _cartBloc;
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +99,7 @@ class __CartItemListWidgetState extends State<_CartItemListWidget> {
         children: <Widget>[
           // TODO: add search field
           BlocBuilder<BlocCart, Cart>(
-            bloc: _cartBloc,
+            //        bloc: _cartBloc,
             builder: (BuildContext context, Cart cart) {
               return Column(
                 children: cart.cartItems
@@ -127,7 +127,7 @@ class __CartItemListWidgetState extends State<_CartItemListWidget> {
 
   @override
   void initState() {
-    _cartBloc = BlocProvider.of<BlocCart>(context);
+    //_cartBloc = BlocProvider.of<BlocCart>(context);
     super.initState();
   }
 }
@@ -145,55 +145,89 @@ class _CartItemWidget extends StatelessWidget {
         right: 8,
         top: 8,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
+      child: Column(
         children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Image.network(
-              cartItem.product.appUrlQualifiedImgUrl,
-              fit: BoxFit.fitWidth,
-              height: 80.0,
-              width: 80.0,
+          ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.network(
+                cartItem.product.appUrlQualifiedImgUrl,
+                fit: BoxFit.fitWidth,
+                //height: 80.0,
+                //width: 80.0,
+              ),
             ),
-          ),
-          SizedBox(
-            width: 12.0,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  cartItem.product.name,
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(
-                  height: 2.0,
-                ),
-                Text(
-                  cartItem.product.price.toString(),
-                  style: TextStyle(
-                    color: PRESENTATION.PRIMARY_COLOR,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+            title: Text(
+              cartItem.product.name,
+              style: TextStyle(
+                //   color: Colors.black87,
+                fontSize: 18,
+                //   fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: PlusMinusInputTextWidget(
+            subtitle: Text(
+              cartItem.product.price.toString(),
+              style: TextStyle(
+                color: PRESENTATION.PRIMARY_COLOR,
+                fontSize: 16,
+                //   fontWeight: FontWeight.w600,
+              ),
+            ),
+            trailing: PlusMinusInputTextWidget(
               cartItem: cartItem,
             ),
           ),
+          /*Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.network(
+                  cartItem.product.appUrlQualifiedImgUrl,
+                  fit: BoxFit.fitWidth,
+                  height: 80.0,
+                  width: 80.0,
+                ),
+              ),
+              SizedBox(
+                width: 12.0,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      cartItem.product.name,
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 2.0,
+                    ),
+                    Text(
+                      cartItem.product.price.toString(),
+                      style: TextStyle(
+                        color: PRESENTATION.PRIMARY_COLOR,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: PlusMinusInputTextWidget(
+                  cartItem: cartItem,
+                ),
+              ),
+            ],
+          ),*/
         ],
       ),
     );

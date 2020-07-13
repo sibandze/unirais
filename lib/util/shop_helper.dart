@@ -46,5 +46,7 @@ String formatDateTime(DateTime dateTime) {
   String suf = ((dateTime.hour) < 12) ? 'a.m' : 'p.m';
   String year =
       ((dateTime.year) == DateTime.now().year) ? '' : ' ${dateTime.year}';
-  return '${weekdays[dateTime.weekday - 1]}, ${months[dateTime.month - 1]} ${dateTime.day}$year, $hours:${dateTime.minute} $suf.';
+  return '${weekdays[dateTime.weekday - 1]}, '
+      '${months[dateTime.month - 1]} ${dateTime.day}$year, '
+      '$hours:${(dateTime.minute.toString().length == 1) ? '0${dateTime.minute}' : dateTime.minute} $suf.';
 }

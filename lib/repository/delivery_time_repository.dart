@@ -11,16 +11,18 @@ class DeliveryTimeRepository {
   static final DeliveryTimeRepository deliveryTimeRepository =
       DeliveryTimeRepository();
 
-  Future<List<DeliveryTime>> getDeliveryTimes() async {
+  Future<List<DeliveryTime>> getDeliveryTimes(
+      {@required Address address}) async {
     List<DeliveryTime> result = await WebService().get(
       Resource(
         parse: (http.Response response) {
           var _result = jsonDecode(response.body);
-          return (_result['residencies'] as List)
+          return (_result['delivery_times'] as List)
               .map((e) => DeliveryTime.fromMap(e))
               .toList();
         },
-        url: CONSTANTS.API_URL + '/app/residencies',
+        url: CONSTANTS.API_URL +
+            '/app/delivery_times/?residence_id=${address.residence}',
       ),
     );
     return result;
@@ -33,7 +35,7 @@ class DeliveryTimeRepository {
           return jsonDecode(response.body);
         },
         params: deliveryTime.toMap(),
-        url: CONSTANTS.API_URL + '/app/residencies/index.php',
+        url: CONSTANTS.API_URL + '/app/delivery_times/index.php',
       ),
     );
     return result['success'];
@@ -46,7 +48,7 @@ class DeliveryTimeRepository {
           return jsonDecode(response.body);
         },
         params: deliveryTime.toMap(),
-        url: CONSTANTS.API_URL + '/app/residencies/index.php',
+        url: CONSTANTS.API_URL + '/app/delivery_times/index.php',
       ),
     );
     return result['success'];
@@ -59,7 +61,7 @@ class DeliveryTimeRepository {
           return jsonDecode(response.body);
         },
         url: CONSTANTS.API_URL +
-            '/app/residencies/index.php/?id=${deliveryTime.id}',
+            '/app/delivery_times/index.php/?id=${deliveryTime.id}',
       ),
     );
     return result['success'];

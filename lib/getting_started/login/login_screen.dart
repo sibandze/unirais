@@ -12,27 +12,26 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  BlocAuthentication _authenticationBloc;
-  BlocLogin _loginBloc;
+  //BlocAuthentication _authenticationBloc;
+  //BlocLogin _loginBloc;
 
   @override
   void initState() {
-    _authenticationBloc = BlocProvider.of<BlocAuthentication>(context);
-    _loginBloc = BlocLogin(authenticationBloc: _authenticationBloc);
+    //_authenticationBloc = BlocProvider.of<BlocAuthentication>(context);
+    //_loginBloc = BlocLogin(authenticationBloc: _authenticationBloc);
     super.initState();
   }
 
   @override
   void dispose() {
-    _loginBloc.close();
-    _authenticationBloc.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => _loginBloc,
+      create: (BuildContext context) => BlocLogin(
+          authenticationBloc: BlocProvider.of<BlocAuthentication>(context)),
       child: _Page(),
     );
   }
@@ -46,28 +45,33 @@ class _Page extends StatefulWidget {
 }
 
 class __PageState extends State<_Page> {
-  BlocLogin _loginBloc;
+//  BlocLogin _loginBloc;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: Colors.black),
-      ),
-      body: Stack(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: LoginForm(),
+    return Stack(
+      children: <Widget>[
+        Scaffold(
+          appBar: AppBar(
+            elevation: 0.0,
+            backgroundColor: Colors.transparent,
+            iconTheme: IconThemeData(color: Colors.black),
           ),
-          BlocBuilder<BlocLogin, LoginState>(
-            bloc: _loginBloc,
-            builder: (BuildContext context, LoginState state) {
-              if (state is LoginLoading) {
-                return Container(
-                  color: PRESENTATION.TITLE_TEXT_COLOR.withOpacity(0.75),
+          body: Stack(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: LoginForm(),
+              ),
+            ],
+          ),
+        ),
+        BlocBuilder<BlocLogin, LoginState>(
+          builder: (BuildContext context, LoginState state) {
+            if (state is LoginLoading) {
+              return SafeArea(
+                child: Container(
+                  color: PRESENTATION.BACKGROUND_COLOR,
                   child: Center(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,38 +79,38 @@ class __PageState extends State<_Page> {
                       children: <Widget>[
                         LoadingBouncingGrid.circle(
                           inverted: true,
-                          borderColor: Colors.white,
+                          borderColor: PRESENTATION.PRIMARY_COLOR,
                           backgroundColor: Colors.transparent,
                         ),
                         Text(
                           "Logging you in...",
                           style: TextStyle(
                               fontSize: 20,
+                            fontFamily: 'Poppins',
+                            color: PRESENTATION.TEXT_LIGHT_COLOR,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                );
-              }
-              return Container();
-            },
-          ),
-        ],
-      ),
+                ),
+              );
+            }
+            return Container();
+          },
+        ),
+      ],
     );
   }
 
   @override
   void initState() {
-    _loginBloc = BlocProvider.of<BlocLogin>(context);
     super.initState();
   }
 
   @override
   void dispose() {
-    _loginBloc.close();
     super.dispose();
   }
 }

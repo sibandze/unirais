@@ -14,7 +14,7 @@ class DeliveryTime extends Equatable {
 
   factory DeliveryTime.fromMap(Map res) {
     return DeliveryTime(
-      orderingCutOffTimes: DateTime.parse(res['ordering_cut_off_times']),
+      orderingCutOffTimes: DateTime.parse(res['ordering_cutoff_time']),
       deliveryTime: DateTime.parse(res['delivery_time']),
       id: res['id'],
     );

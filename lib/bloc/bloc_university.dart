@@ -22,7 +22,7 @@ class BlocUniversity extends Bloc<BlocUniversityEvent, BlocUniversityState> {
               university: event.university);
         }
         if (event is BlocUniversityEventUpdate) {
-          bool success = await _universityRepository.updateUniversity(
+          success = await _universityRepository.updateUniversity(
               university: event.university);
         } else if (event is BlocUniversityEventDelete) {
           success = await _universityRepository.deleteUniversity(
@@ -35,7 +35,7 @@ class BlocUniversity extends Bloc<BlocUniversityEvent, BlocUniversityState> {
         print(e);
         yield BlocUniversityStateCUDFailure();
       }
-    } else if (state is BlocUniversityEventFetch) {
+    } else if (event is BlocUniversityEventFetch) {
       yield BlocUniversityStateFetching();
       await Future.delayed(Duration(
         //milliseconds: LOADING_DELAY_TIME,

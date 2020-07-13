@@ -2,27 +2,28 @@ import 'package:equatable/equatable.dart';
 
 abstract class OrderState extends Equatable {
   final int value;
+  final String state;
 
-  OrderState(this.value);
+  OrderState(this.value, this.state);
 
   @override
-  List<Object> get props => props;
+  List<Object> get props => [value, state];
 }
 
 class PendingOrder extends OrderState {
-  PendingOrder() : super(0);
+  PendingOrder() : super(0, 'Pending');
 }
 
 class ConfirmedOrder extends OrderState {
-  ConfirmedOrder() : super(1);
+  ConfirmedOrder() : super(1, 'Confirmed');
 }
 
 class DeliveredOrder extends OrderState {
-  DeliveredOrder() : super(2);
+  DeliveredOrder() : super(2, 'Delivered');
 }
 
 class CancelledOrder extends OrderState {
-  CancelledOrder() : super(3);
+  CancelledOrder() : super(3, 'Cancelled');
 }
 
 /*class OrderCancelledByUser extends CancelledOrder {

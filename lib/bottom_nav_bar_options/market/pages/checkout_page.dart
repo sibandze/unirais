@@ -29,13 +29,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   void placeOrder(Cart cart) {
     _orderBloc.add(
-      PlaceOrder(
-        Order.newOrder(
+      BlocOrderEventCreate(
+        order: Order.newOrder(
           cart: cart,
           deliveryAddress: "Address",
           deliveryNote: 'Note',
         ),
-        _cartBloc,
       ),
     );
   }
@@ -43,111 +42,109 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void initState() {
     _cartBloc = BlocProvider.of<BlocCart>(context);
-    _orderBloc = BlocProvider.of<BlocOrder>(context);
     _cartBloc.add(BlocCartEvent());
+
+    _orderBloc = BlocProvider.of<BlocOrder>(context);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(CONSTANTS.CHECKOUT_TITLE),
-      ),
-      body: Stack(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              Expanded(
-                child: ListView(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 12,
-                    ),
-                    _DeliveryAddressWidget(),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    _deliveryTimesWidget(),
-                    SizedBox(
-                      height: 12,
-                    ),
+    return BlocListener<BlocOrder, BlocOrderState>(
+      listener: (BuildContext context, BlocOrderState state) async {
+        if (state is BlocOrderStateCUDSuccess) {
+          _cartBloc.add(BlocCartEvent.deleteAll());
+          await Future.delayed(Duration(
+            milliseconds: CONSTANTS.LOADING_DELAY_TIME_SHORT,
+          ));
+          pushAndRemoveUntil(
+            context,
+            UniRaisAppHome(
+              selectedNavBarOption: 2,
+            ),
+            false,
+          );
+        }
+        else if (state is BlocOrderStateCUDFailure) {
+          Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Your order was not successful!'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(CONSTANTS.CHECKOUT_TITLE),
+        ),
+        body: Stack(
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                Expanded(
+                  child: ListView(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 12,
+                      ),
+                      _DeliveryAddressWidget(),
+                      SizedBox(
+                        height: 12,
+                      ),
 
-                    ///ApplyPromoCodeWidget(),
-                    ///WalletWidget(),
-                  ],
-                ), // TODO
-              ),
-              Card(
-                color: PRESENTATION.PRIMARY_COLOR,
-                shadowColor: PRESENTATION.PRIMARY_COLOR,
-                elevation: 4,
-                child: PaymentSummaryWidget(),
-              ),
-              SizedBox(
-                height: 12.0,
-              ),
-              BlocBuilder<BlocCart, Cart>(
-                bloc: _cartBloc,
-                builder: (BuildContext context, Cart cart) {
-                  return (cart.isNotEmpty)
-                      ? InkWell(
-                          onTap: () {
-                            if (cart.isNotEmpty) placeOrder(cart);
-                          },
-                          child: Container(
-                            color: PRESENTATION.PRIMARY_COLOR,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    'Place order',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+                      ///ApplyPromoCodeWidget(),
+                      ///WalletWidget(),
+                    ],
+                  ), // TODO
+                ),
+                Card(
+                  color: PRESENTATION.PRIMARY_COLOR,
+                  shadowColor: PRESENTATION.PRIMARY_COLOR,
+                  elevation: 4,
+                  child: PaymentSummaryWidget(),
+                ),
+                SizedBox(
+                  height: 12.0,
+                ),
+                BlocBuilder<BlocCart, Cart>(
+                  bloc: _cartBloc,
+                  builder: (BuildContext context, Cart cart) {
+                    return (cart.isNotEmpty)
+                        ? InkWell(
+                      onTap: () {
+                        if (cart.isNotEmpty) placeOrder(cart);
+                      },
+                      child: Container(
+                        color: PRESENTATION.PRIMARY_COLOR,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                'Place order',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        )
-                      : Container();
-                },
-              ),
-            ],
-          ),
-          BlocListener<BlocOrder, OrderingState>(
-            bloc: _orderBloc,
-            listener: (BuildContext context, OrderingState state) async {
-              if (state is PlacingOrderFailed) {
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Your order was not successful!'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              } else if (state is PlacingOrderSuccess) {
-                await Future.delayed(Duration(
-                  milliseconds: CONSTANTS.LOADING_DELAY_TIME_SHORT,
-                ));
-                pushAndRemoveUntil(
-                  context,
-                  UniRaisAppHome(
-                    selectedNavBarOption: 2,
-                  ),
-                  false,
-                );
-              }
-            },
-            child: BlocBuilder<BlocOrder, OrderingState>(
+                        ),
+                      ),
+                    )
+                        : Container();
+                  },
+                ),
+              ],
+            ),
+            BlocBuilder<BlocOrder, BlocOrderState>(
               bloc: _orderBloc,
-              builder: (BuildContext context, OrderingState state) {
-                if (state is PlacingOrder)
+              builder: (BuildContext context, BlocOrderState state) {
+                if (state is BlocOrderStateCUDProcessing)
                   return Container(
                     color: PRESENTATION.BACKGROUND_COLOR.withOpacity(0.75),
                     child: Center(
@@ -172,7 +169,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ),
                     ),
                   );
-                else if (state is PlacingOrderSuccess)
+                else if (state is BlocOrderStateCUDSuccess)
                   return Container(
                     color: PRESENTATION.BACKGROUND_COLOR,
                     padding: EdgeInsets.all(48),
@@ -197,36 +194,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 return Container();
               },
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _deliveryTimesWidget() {
-    return Container(
-      color: PRESENTATION.BACKGROUND_COLOR,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            "Deliver time",
-            style: TextStyle(
-              fontSize: 16,
-              color: PRESENTATION.TEXT_LIGHT_COLOR,
-              fontWeight: FontWeight.w600,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.place),
-            title: Text('selectedLocation.savedAs'),
-            subtitle: Text('selectedLocation.toString()'),
-            trailing: IconButton(
-                icon: Icon(Icons.arrow_forward_ios), onPressed: () {}),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -239,101 +208,199 @@ class _DeliveryAddressWidget extends StatefulWidget {
 
 class __DeliveryAddressWidgetState extends State<_DeliveryAddressWidget> {
   BlocAddress _blocAddress;
+  BlocDeliveryTime _blocDeliveryTime;
   List<Address> _addresses;
+  List<DeliveryTime> _deliveryTimes;
   bool _addressFirstLoad = true;
   Address selectedAddress;
+
+  DeliveryTime selectDeliveryTime;
 
   @override
   void initState() {
     _blocAddress = BlocProvider.of<BlocAddress>(context);
+    _blocDeliveryTime = BlocProvider.of<BlocDeliveryTime>(context);
     _blocAddress.add(BlocEventAddressFetch());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<BlocAddress, BlocStateAddress>(
-      bloc: _blocAddress,
-      listener: (BuildContext context, BlocStateAddress state) {
-        if (state is BlocStateAddressFetchingSuccess && _addressFirstLoad) {
-          setState(() {
-            if (state.addresses != null) {
-              _addresses = state.addresses;
-              if (_addresses.isNotEmpty) {
-                selectedAddress = _addresses[0];
-              }
-            } else {
-              _addresses = [];
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<BlocDeliveryTime, BlocDeliveryTimeState>(
+          listener: (BuildContext context, BlocDeliveryTimeState state) {
+            if (state is BlocDeliveryTimeStateFetchingSuccess) {
+              setState(() {
+                if (state.deliveryTimes != null) {
+                  _deliveryTimes = state.deliveryTimes;
+                  if (_deliveryTimes.isNotEmpty) {
+                    selectDeliveryTime = _deliveryTimes[0];
+                  }
+                } else {
+                  _deliveryTimes = [];
+                }
+              });
             }
-            _addressFirstLoad = false;
-          });
-        }
-      },
-      child: Container(
-        color: PRESENTATION.BACKGROUND_COLOR,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              "Deliver to",
-              style: TextStyle(
-                fontSize: 16,
-                color: PRESENTATION.TEXT_LIGHT_COLOR,
-                fontWeight: FontWeight.w600,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            BlocBuilder<BlocAddress, BlocStateAddress>(
-              bloc: _blocAddress,
-              builder: (BuildContext context, BlocStateAddress state) {
-                if (_addresses != null && _addresses.isNotEmpty) {
-                  return DropdownButton<Address>(
-                    isExpanded: true,
-                    elevation: 16,
-                    itemHeight: 80,
-                    icon: Icon(Icons.arrow_drop_down),
-                    underline: Container(
-                      height: 0,
-                    ),
-                    selectedItemBuilder: (BuildContext context) => _addresses
-                        .map<Widget>((Address address) => ListTile(
-                              leading: Icon(Icons.place),
+          },
+        ),
+        BlocListener<BlocAddress, BlocStateAddress>(
+          listener: (BuildContext context, BlocStateAddress state) {
+            if (state is BlocStateAddressFetchingSuccess) {
+              setState(() {
+                if (state.addresses != null) {
+                  _deliveryTimes = null;
+                  _addresses = state.addresses;
+                  if (_addresses.isNotEmpty) {
+                    selectedAddress = _addresses[0];
+                    _blocDeliveryTime.add(
+                        BlocDeliveryTimeEventFetch(address: selectedAddress));
+                  }
+                } else {
+                  _addresses = [];
+                }
+              });
+            }
+          },
+        ),
+      ],
+      child: Column(
+        children: <Widget>[
+          Container(
+            color: PRESENTATION.BACKGROUND_COLOR,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "Deliver to",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: PRESENTATION.TEXT_LIGHT_COLOR,
+                    fontWeight: FontWeight.w600,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                BlocBuilder<BlocAddress, BlocStateAddress>(
+                  bloc: _blocAddress,
+                  builder: (BuildContext context, BlocStateAddress state) {
+                    if (_addresses != null && _addresses.isNotEmpty) {
+                      return DropdownButton<Address>(
+                        isExpanded: true,
+                        elevation: 16,
+                        itemHeight: 80,
+                        icon: Icon(Icons.arrow_drop_down),
+                        underline: Container(
+                          height: 0,
+                        ),
+                        selectedItemBuilder: (BuildContext context) =>
+                            _addresses
+                                .map<Widget>((Address address) =>
+                                ListTile(
+                                  leading: Icon(Icons.place),
+                                  title: Text(
+                                    address.savedAs,
+                                  ),
+                                  subtitle: Text(
+                                    address.address,
+                                  ),
+                                ))
+                                .toList(),
+                        items: _addresses
+                            .map<DropdownMenuItem<Address>>((Address address) {
+                          return DropdownMenuItem<Address>(
+                            value: address,
+                            child: ListTile(
                               title: Text(
                                 address.savedAs,
                               ),
                               subtitle: Text(
                                 address.address,
                               ),
-                            ))
-                        .toList(),
-                    items: _addresses
-                        .map<DropdownMenuItem<Address>>((Address address) {
-                      return DropdownMenuItem<Address>(
-                        value: address,
-                        child: ListTile(
-                          title: Text(
-                            address.savedAs,
-                          ),
-                          subtitle: Text(
-                            address.address,
-                          ),
-                        ),
+                            ),
+                          );
+                        }).toList(),
+                        value: selectedAddress,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedAddress = value;
+                          });
+                        },
                       );
-                    }).toList(),
-                    value: selectedAddress,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedAddress = value;
-                      });
-                    },
-                  );
-                }
-                return Container();
-              },
+                    }
+                    return Container();
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          BlocBuilder<BlocDeliveryTime, BlocDeliveryTimeState>(
+            builder: (BuildContext context, BlocDeliveryTimeState state) {
+              if (_deliveryTimes != null &&
+                  _deliveryTimes.isNotEmpty) {
+                return Container(
+                  color: PRESENTATION.BACKGROUND_COLOR,
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Deliver time",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: PRESENTATION.TEXT_LIGHT_COLOR,
+                          fontWeight: FontWeight.w600,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      DropdownButton<DeliveryTime>(
+                        isExpanded: true,
+                        elevation: 16,
+                        icon: Icon(Icons.arrow_drop_down),
+                        underline: Container(
+                          height: 0,
+                        ),
+                        selectedItemBuilder: (BuildContext context) =>
+                            _deliveryTimes
+                                .map<Widget>(
+                                    (DeliveryTime deliveryTime) =>
+                                    ListTile(
+                                      leading: Icon(Icons.access_time),
+                                      title: Text(
+                                        formatDateTime(
+                                            deliveryTime.deliveryTime),
+                                      ),
+                                    ))
+                                .toList(),
+                        items: _deliveryTimes
+                            .map<DropdownMenuItem<DeliveryTime>>(
+                                (DeliveryTime deliveryTime) {
+                              return DropdownMenuItem<DeliveryTime>(
+                                value: deliveryTime,
+                                child: Text(
+                                  formatDateTime(deliveryTime.deliveryTime),
+                                ),
+                              );
+                            }).toList(),
+                        value: selectDeliveryTime,
+                        onChanged: (value) {
+                          setState(() {
+                            selectDeliveryTime = value;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return Container();
+            },
+          ),
+        ],
       ),
     );
   }

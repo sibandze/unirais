@@ -21,9 +21,7 @@ class BlocAuthentication
     if (event is BlocEventAuthenticationAppStarted) {
       yield BlocStateAuthenticationUninitialized();
       final bool hasToken = await userRepository.hasToken();
-      await Future.delayed(Duration(
-        milliseconds: LOADING_DELAY_TIME,
-      ));
+      //await Future.delayed(Duration(milliseconds: LOADING_DELAY_TIME,));
       if (hasToken)
         yield BlocStateAuthenticationAuthenticated();
       else
@@ -31,16 +29,11 @@ class BlocAuthentication
     } else if (event is BlocEventAuthenticationLoggedIn) {
       yield BlocStateAuthenticationLoading();
       await userRepository.persistToken(token: event.token);
-      await Future.delayed(Duration(
-        milliseconds: LOADING_DELAY_TIME,
-      ));
+      //await Future.delayed(Duration(milliseconds: LOADING_DELAY_TIME,));
       yield BlocStateAuthenticationAuthenticated();
     } else if (event is BlocEventAuthenticationLoggedOut) {
       yield BlocStateAuthenticationUninitialized();
       await userRepository.deleteToken();
-      await Future.delayed(Duration(
-        milliseconds: LOADING_DELAY_TIME,
-      ));
       yield BlocStateAuthenticationUnauthenticated();
     }
   }

@@ -22,7 +22,7 @@ class BlocDeliveryTime
           success = await _deliveryTimeRepository.addDeliveryTime(
               deliveryTime: event.deliveryTime);
         } else if (event is BlocDeliveryTimeEventUpdate) {
-          bool success = await _deliveryTimeRepository.updateDeliveryTime(
+          success = await _deliveryTimeRepository.updateDeliveryTime(
               deliveryTime: event.deliveryTime);
         } else if (event is BlocDeliveryTimeEventDelete) {
           success = await _deliveryTimeRepository.deleteDeliveryTime(
@@ -35,10 +35,11 @@ class BlocDeliveryTime
         print(e);
         yield BlocDeliveryTimeStateCUDFailure();
       }
-    } else if (state is BlocDeliveryTimeEventFetch) {
+    } else if (event is BlocDeliveryTimeEventFetch) {
       yield BlocDeliveryTimeStateFetching();
       try {
-        final deliveryTimes = await _deliveryTimeRepository.getDeliveryTimes();
+        final deliveryTimes = await _deliveryTimeRepository.getDeliveryTimes(
+            address: event.address);
         yield BlocDeliveryTimeStateFetchingSuccess(
             deliveryTimes: deliveryTimes);
       } catch (e) {

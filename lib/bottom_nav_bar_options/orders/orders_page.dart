@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:unirais/bottom_nav_bar_options/orders/pages/order_each_page.dart';
 
 import './../../bloc/_bloc.dart';
 import './../../model/_model.dart';
@@ -54,7 +55,8 @@ class _OrdersPageState extends State<OrdersPage> {
                       style: TextStyle(
                           color: PRESENTATION.BACKGROUND_COLOR,
                           fontWeight: (_show == index) ? FontWeight.w600 : null,
-                          fontSize: (_show == index) ? 15 : null),
+                        fontSize: (_show == index) ? 15 : null,
+                      ),
                     ),
                     backgroundColor: item.color,
                     padding: EdgeInsets.symmetric(
@@ -66,9 +68,10 @@ class _OrdersPageState extends State<OrdersPage> {
                       });
                       if (value)
                         (index == 0)
-                            ? _orderBloc.add(FetchOrders())
+                            ? _orderBloc.add(BlocOrderEventFetch())
                             : _orderBloc
-                                .add(FetchOrders(orderState: item.orderState));
+                            .add(BlocOrderEventFetch(orderState: item
+                            .orderState));
                     },
                     selectedColor: item.color,
                     selected: _show == index,
@@ -78,10 +81,9 @@ class _OrdersPageState extends State<OrdersPage> {
             ),
           ),
           Expanded(
-            child: BlocBuilder<BlocOrder, OrderingState>(
-              bloc: _orderBloc,
-              builder: (BuildContext context, OrderingState state) {
-                if (state is FetchingOrdersSuccessful) {
+            child: BlocBuilder<BlocOrder, BlocOrderState>(
+              builder: (BuildContext context, BlocOrderState state) {
+                if (state is BlocOrderStateFetchingSuccess) {
                   List<Order> _orders = state.orders;
                   return ListView.separated(
                       separatorBuilder: (BuildContext context, int index) =>
@@ -116,7 +118,7 @@ class _OrdersPageState extends State<OrdersPage> {
   @override
   void initState() {
     _orderBloc = BlocProvider.of<BlocOrder>(context);
-    _orderBloc.add(FetchOrders());
+    _orderBloc.add(BlocOrderEventFetch());
     super.initState();
   }
 }
@@ -149,7 +151,7 @@ class OrderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        //push(context, OrderPage());
+        push(context, OrderDetailsPage(orderNumber: _order.orderNumber,));
       },
       child: Padding(
         padding: EdgeInsets.symmetric(

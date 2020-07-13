@@ -1,34 +1,49 @@
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 import './../../model/_model.dart';
 
-class FetchingOrders extends OrderingState {}
+abstract class BlocOrderState extends Equatable {
+  final _props;
 
-class FetchingOrdersFailed extends OrderingState {}
-
-class FetchingOrdersSuccessful extends OrderingState {
-  final List<Order> orders;
-
-  FetchingOrdersSuccessful({this.orders}) : super(props: orders);
-}
-
-abstract class OrderingState extends Equatable {
-  final List _props;
-
-  OrderingState({props = const []}) : _props = props;
+  BlocOrderState({props}) : this._props = (props == null) ? [] : props;
 
   @override
   List<Object> get props => _props;
 }
 
-class OrderingStateUninitialised extends OrderingState {}
+class BlocOrderStateInitial extends BlocOrderState {}
 
-class PlacingOrder extends OrderingState {}
+class BlocOrderStateFetching extends BlocOrderState {}
 
-class PlacingOrderFailed extends OrderingState {
-  final String message;
+class BlocOrderStateFetchingSuccess extends BlocOrderState {
+  final List<Order> orders;
 
-  PlacingOrderFailed({this.message = ''}) : super(props: [message]);
+  BlocOrderStateFetchingSuccess({
+    @required this.orders,
+  }) : super(props: [orders]);
 }
 
-class PlacingOrderSuccess extends OrderingState {}
+class BlocOrderStateFetchingFailure extends BlocOrderState {}
+
+class BlocOrderStateFetchingOrder extends BlocOrderState {}
+
+class BlocOrderStateFetchingOrderSuccess extends BlocOrderState {
+  final Order order;
+
+  BlocOrderStateFetchingOrderSuccess({
+    @required this.order,
+  }) : super(props: [order]);
+}
+
+class BlocOrderStateFetchingOrderFailure extends BlocOrderState {}
+
+class BlocOrderStateCUDFailure extends BlocOrderStateCUD {}
+
+class BlocOrderStateCUDProcessing extends BlocOrderStateCUD {}
+
+abstract class BlocOrderStateCUD extends BlocOrderState {
+  BlocOrderStateCUD({props = const []}) : super(props: props);
+}
+
+class BlocOrderStateCUDSuccess extends BlocOrderStateCUD {}

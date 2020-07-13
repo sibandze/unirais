@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 abstract class BlocEventAuthentication extends Equatable {
-  final List _props;
+  final _props;
 
   BlocEventAuthentication([this._props = const []]);
 

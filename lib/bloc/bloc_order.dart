@@ -1,53 +1,57 @@
 import 'package:bloc/bloc.dart';
 
-import './../const/_const.dart' as CONSTANTS;
-import './../model/_model.dart';
 import './../repository/_repository.dart';
 import './events/_events.dart';
 import './states/_states.dart';
 
-class BlocOrder extends Bloc<OrderEvent, OrderingState> {
-  final OrderRepository _orderRepository = OrderRepository.orderRepository;
+class BlocOrder extends Bloc<BlocOrderEvent, BlocOrderState> {
+  final _orderRepository = OrderRepository.orderRepository;
 
   @override
-  get initialState => OrderingStateUninitialised();
+  get initialState => BlocOrderStateInitial();
 
   @override
-  Stream<OrderingState> mapEventToState(event) async* {
-    if (event is PlaceOrder) {
-      yield PlacingOrder();
-      await Future.delayed(Duration(
-        milliseconds: CONSTANTS.LOADING_DELAY_TIME,
-      ));
+  Stream<BlocOrderState> mapEventToState(BlocOrderEvent event) async* {
+    if (event is BlocOrderEventCUD) {
+      yield BlocOrderStateCUDProcessing();
       try {
-        final success = await _orderRepository.makeOrders(order: event.order);
-        //print(success);
-        if (success) {
-          event.cartBloc.add(BlocCartEvent.deleteAll());
-          yield PlacingOrderSuccess();
-        } else
-          PlacingOrderFailed();
-      } catch (e) {
-        print('error: ' + e.toString());
-        yield PlacingOrderFailed(message: e.toString());
-      }
-      await Future.delayed(Duration(
-        milliseconds: CONSTANTS.LOADING_DELAY_TIME,
-      ));
-      yield OrderingStateUninitialised();
-    } else if (event is FetchOrders) {
-      yield FetchingOrders();
-      await Future.delayed(Duration(
-        milliseconds: CONSTANTS.LOADING_DELAY_TIME,
-      ));
-      try {
-        List<Order> _orders = await _orderRepository.getOrders(
-            orderState:
-                (event.orderState == null) ? null : event.orderState.value);
-        yield FetchingOrdersSuccessful(orders: _orders);
+        bool success = false;
+        if (event is BlocOrderEventCreate) {
+          success = await _orderRepository.makeOrder(order: event.order);
+        } else if (event is BlocOrderEventUpdate) {
+          success = await _orderRepository.updateOrder(order: event.order);
+        } else if (event is BlocOrderEventDelete) {
+          success = await _orderRepository.deleteOrder(order: event.order);
+        }
+        yield (success)
+            ? BlocOrderStateCUDSuccess()
+            : BlocOrderStateCUDFailure();
       } catch (e) {
         print(e);
-        yield FetchingOrdersFailed();
+        yield BlocOrderStateCUDFailure();
+      }
+    } else if (event is BlocOrderEventFetch) {
+      yield BlocOrderStateFetching();
+      try {
+        final orders = await _orderRepository.getOrders(
+            orderState: event.orderState);
+        yield BlocOrderStateFetchingSuccess(
+            orders: orders);
+      } catch (e) {
+        print(e);
+        yield BlocOrderStateFetchingFailure();
+      }
+    }
+    else if (event is BlocOrderEventFetchOrder) {
+      yield BlocOrderStateFetchingOrder();
+      try {
+        final order = await _orderRepository.getOrder(
+            orderNumber: event.orderNumber);
+        yield BlocOrderStateFetchingOrderSuccess(
+            order: order);
+      } catch (e) {
+        print(e);
+        yield BlocOrderStateFetchingOrderFailure();
       }
     }
   }

@@ -12,7 +12,11 @@ class BlocDeliveryTimeEvent extends Equatable {
   List<Object> get props => _props;
 }
 
-class BlocDeliveryTimeEventFetch extends BlocDeliveryTimeEvent {}
+class BlocDeliveryTimeEventFetch extends BlocDeliveryTimeEvent {
+  final Address address;
+
+  BlocDeliveryTimeEventFetch({@required this.address});
+}
 
 abstract class BlocDeliveryTimeEventCUD extends BlocDeliveryTimeEvent {
   BlocDeliveryTimeEventCUD({props}) : super(props: props);

@@ -1,26 +1,51 @@
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
-import './../../model/shop/_shop.dart';
-import './../bloc_cart.dart';
+import './../../model/_model.dart';
 
-class FetchOrders extends OrderEvent {
-  final OrderState orderState;
+abstract class BlocOrderEvent extends Equatable {
+  final _props;
 
-  FetchOrders({this.orderState}) : super(props: [orderState]);
-}
-
-abstract class OrderEvent extends Equatable {
-  final List _props;
-
-  OrderEvent({props = const []}) : _props = props;
+  BlocOrderEvent({props = const []}) : this._props = props;
 
   @override
   List<Object> get props => _props;
 }
 
-class PlaceOrder extends OrderEvent {
-  final Order order;
-  final BlocCart cartBloc;
+class BlocOrderEventFetch extends BlocOrderEvent {
+  final OrderState orderState;
 
-  PlaceOrder(this.order, this.cartBloc) : super(props: [order]);
+  BlocOrderEventFetch({this.orderState}) :super(props: [orderState]);
+}
+
+class BlocOrderEventFetchOrder extends BlocOrderEvent {
+  final String orderNumber;
+
+  BlocOrderEventFetchOrder({@required this.orderNumber})
+      :super(props: [orderNumber]);
+}
+
+abstract class BlocOrderEventCUD extends BlocOrderEvent {
+  BlocOrderEventCUD({props}) : super(props: props);
+}
+
+class BlocOrderEventCreate extends BlocOrderEventCUD {
+  final Order order;
+
+  BlocOrderEventCreate({@required this.order})
+      : super(props: [order]);
+}
+
+class BlocOrderEventUpdate extends BlocOrderEventCUD {
+  final Order order;
+
+  BlocOrderEventUpdate({@required this.order})
+      : super(props: [order]);
+}
+
+class BlocOrderEventDelete extends BlocOrderEventCUD {
+  final Order order;
+
+  BlocOrderEventDelete({@required this.order})
+      : super(props: [order]);
 }
